@@ -57,42 +57,72 @@ app.get('/:subject/:id', (req, res, next) => {
                 return next(err);
             }
 
+
             let objs = [];
             for (let i in rows) {
 
                 let soln = [];
                 let str;
+                let senityCheck = 0;
 
-                while(soln.length === 0){
-
+                while (soln.length === 0 || senityCheck === 0) {
+                    senityCheck = 1;
                     let ansInsert = [];
                     str = rows[i].statement.toString();
 
-                    if(str.indexOf('<code>') > -1) {
+                    while (str.indexOf('<code>') > -1) {
                         let randomNum = randomIntInc(10, 25);
-                        ansInsert.push (randomNum);
-                        result = str.replace('<code>', randomNum);
+                        ansInsert.push(randomNum);
+                        str = str.replace('<code>', randomNum);
+                    } //replace numeric with random numbers
+
+                    for (let i = 0; i < 15; i = i + 6) {
+
+                        if ((ansInsert[i] === ansInsert[i + 2] &&  ansInsert[i + 1] === ansInsert[i + 3]) ||
+                            (ansInsert[i + 2] === ansInsert[i + 4] && ansInsert[i + 3] === ansInsert[i + 5]) ||
+                            (ansInsert[i] === ansInsert[i + 4] && ansInsert[i + 1] === ansInsert[i + 5])) {
+
+                            senityCheck = 0;
+                            continue;
+                        }
+                    } //check if two players are identical
+
+                    if (senityCheck === 0) {
+                        continue;
                     }
 
-                    let max_point = 0;
 
-                    for (let i in [0,2,4]){
-                        for (let j in [6, 8, 10]){
-                            for (let k in [12, 14, 16]){
-                                if (ansInsert[i+1] + ansInsert[j+1] + ansInsert[k+1] <= 50){
+
+                    let max_point = 0;
+                    let min_money = 0;
+
+                    for (let i = 0; i <= 4; i = i + 2) {
+                        for (let j = 6; j <= 10; j = j + 2) {
+                            for (let k = 12; k <= 16; k = k + 2) {
+                                let tot_money = ansInsert[i + 1] + ansInsert[j + 1] + ansInsert[k + 1];
+                                if (tot_money <= 50) {
                                     let totPoint = ansInsert[i] + ansInsert[j] + ansInsert[k];
-                                    if (totPoint===max_point){
-                                        solu.push([i/2,(j-6)/2,(k-12)/2]);
+                                    if (totPoint === max_point) {
+                                        if (min_money > tot_money) {
+                                            min_money = tot_money;
+                                            soln = [[i / 2, (j - 6) / 2, (k - 12) / 2]];
+                                        }
+                                        else if (min_money === tot_money) {
+                                            soln.push([i / 2, (j - 6) / 2, (k - 12) / 2]);
+                                        }
                                     }
                                     else if (totPoint > max_point) {
-                                        soln = [ [i/2,(j-6)/2,(k-12)/2] ];
+                                        max_point = totPoint;
+                                        min_money = tot_money;
+                                        soln = [[i / 2, (j - 6) / 2, (k - 12) / 2]];
                                     }
                                 }
                             }
                         }
-                    }
-                }
 
+
+                    } // find solution if no solution exists makes another problem
+                } //find at least one solution
                 objs.push({
                     id: rows[i].id,
                     category: rows[i].category,
@@ -103,7 +133,7 @@ app.get('/:subject/:id', (req, res, next) => {
                     hint: rows[i].hint,
                     solution: soln,
                 });
-            }
+            }//
 
             res.json(objs);
         });
@@ -116,6 +146,5 @@ app.get('/:subject/:id', (req, res, next) => {
     }
 
 });
-
 
 app.listen(process.env.PORT || 3000);
