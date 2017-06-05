@@ -1,0 +1,13 @@
+{
+  "name": "Parthenos-backend",
+  "version": "0.0.1",
+  "dependencies": {
+    "mysql": "^2.5.4",
+    "express": "^4.15.3",
+    "cors": "^2.8.3"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+
+}
