@@ -3,6 +3,8 @@
  */
 import React, { Component } from 'react';
 
+
+//if I have time, this part should refacted and should belong to problem.js not the list of problems
 class Tutorial extends Component{
 
     constructor(props){
@@ -24,7 +26,7 @@ class Tutorial extends Component{
         this.handleCChange = this.handleCChange.bind(this);
     }
 
-
+    //change of three selecting role players
     handleAChange(e){
         e.preventDefault();
         let playerSel = this.state.playerSel;
@@ -52,18 +54,24 @@ class Tutorial extends Component{
         });
 
     }
+
+    //whether to show the problem
     clickMe(e){
         e.preventDefault();
         this.setState({
             showProblem : this.state.showProblem? 0: 1
         })
     }
+
+    //whether to show the solution
     clickAns(e){
         e.preventDefault();
         this.setState({
             showAns : this.state.showAns? 0: 1
         })
     }
+
+    //whether to show the hint
     clickHint(e){
         e.preventDefault();
         this.setState({
@@ -71,6 +79,7 @@ class Tutorial extends Component{
         })
     }
 
+    //after click submit, check solution against user answer
     submitClick(e){
         e.preventDefault();
         for (let i in this.state.problem.solution) {

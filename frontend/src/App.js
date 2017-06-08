@@ -17,6 +17,7 @@ class App extends Component {
       this.handleClick = this.handleClick.bind(this);
   }
 
+  //this is not optimal. When the list gets big, it will slow down the home page
   componentDidMount(){
       axios.get('http://sample-env-2.8t95hzwxpb.us-east-1.elasticbeanstalk.com/tutorial/1')
           .then( (response) => {

@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 
+//if I have time, this part should be refacted and should belong to contest.js not the list of contests
 class Competition extends Component{
 
     constructor(props){
@@ -24,18 +25,20 @@ class Competition extends Component{
 
     }
 
+    //after click submit code button
     handleCodeSubmit(e){
         e.preventDefault();
         this.setState({
             compiledOut : null,
             errerMsg: null
         });
-        //console.log(this.state.textCode);
+
+        //POST request sent
         axios.post('http://sample-env-2.8t95hzwxpb.us-east-1.elasticbeanstalk.com/'+this.state.language, {
            code: this.state.textCode
         })
             .then( (response) => {
-                //console.log(response)
+                //understand whether the stdout is compiled output or error msg
                 if ( ('output' in response.data) ){
                     this.setState({
                         compiledOut : response.data.output
@@ -68,6 +71,7 @@ class Competition extends Component{
 
     }
 
+    //if i have time, this part should be code editor (with syntax highlight)
     handleTextChange(e){
         e.preventDefault();
         this.setState({
@@ -75,6 +79,7 @@ class Competition extends Component{
         })
     }
 
+    //user select different languages and some default codes are used
     handleLangChange(e){
         e.preventDefault();
         this.setState({
@@ -116,7 +121,7 @@ func main() {
         }
     }
 
-
+    //whether to show the contest problem
     clickMe(e){
         e.preventDefault();
         this.setState({
