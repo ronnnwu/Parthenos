@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Tutorial from './tutorial/tutorial';
 import Competition from './competition/competiton';
+import axios from 'axios';
 import './App.css';
 
 
@@ -10,8 +11,25 @@ class App extends Component {
       super(props);
       this.state = {
           value: '',
+          problem: null,
+          contest: null
       };
       this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentDidMount(){
+      axios.get('http://sample-env-2.8t95hzwxpb.us-east-1.elasticbeanstalk.com/tutorial/1')
+          .then( (response) => {
+              this.setState ({
+                  problem: response.data[0]
+              });
+          });
+      axios.get('http://sample-env-2.8t95hzwxpb.us-east-1.elasticbeanstalk.com/competition/1')
+          .then( (response) => {
+              this.setState ({
+                  contest: response.data[0]
+              });
+          });
   }
 
   handleClick(e){
@@ -33,10 +51,10 @@ class App extends Component {
     let displayBlock;
 
     if (this.state.value ==='tutorial'){
-        displayBlock = <Tutorial/>;
+        displayBlock = <Tutorial problem = {this.state.problem}/>;
     }
     else if (this.state.value ==='competition'){
-        displayBlock = <Competition/>;
+        displayBlock = <Competition contest = {this.state.contest}/>;
     }
     else{
         displayBlock = null;
@@ -58,7 +76,7 @@ class App extends Component {
         <div className="displayBlock">
              { displayBlock }
         </div>
-
+          <br/><br/>
       </div>
     );
   }

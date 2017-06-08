@@ -1,1 +1,0 @@
-{"version":3,"sources":["App.css"],"names":[],"mappings":"AAAA,KACI,aACA,mBACA,mBAAqB,CAGzB,QACI,cAAgB","file":"static/css/main.66c2e5ec.css","sourcesContent":[".App  {\n    padding: 70px;\n    padding-left: 200px;\n    padding-right: 200px;\n}\n\na:hover  {\n    cursor: pointer;\n}\n\n\n// WEBPACK FOOTER //\n// ./src/App.css"],"sourceRoot":""}

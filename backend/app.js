@@ -2,10 +2,13 @@
 
 let http = require('http'),
     cors = require('cors'),
+    bodyParser = require('body-parser'),
     express = require('express'),
     app = express()
 
-app.use(cors())
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 let mysql = require('mysql'), mysqlServer;
 
@@ -29,7 +32,7 @@ let mysql = require('mysql'), mysqlServer;
     }
 
 
-var getProblem = function(callback) {
+const getProblem = function(callback) {
 
     mysqlServer.query('SELECT * FROM problem WHERE id = 1', function(err, rows, fields) {
 
@@ -40,13 +43,25 @@ var getProblem = function(callback) {
     });
 }
 
+const getCompetition = function(callback) {
+
+    mysqlServer.query('SELECT * FROM competition WHERE id = 1', function(err, rows, fields) {
+
+        if (!err)
+            return callback(null, rows);
+        else
+            return callback('Cannot connect to db');
+    });
+}
+
 app.get('/', (req, res) => {
-    res.send('This is the Parthenos REST API backend')
+    res.send('This is the Parthenos REST API backend' );
 });
 
 function randomIntInc (low, high) {
     return Math.floor(Math.random() * (high - low + 1) + low);
 }
+
 
 app.get('/:subject/:id', (req, res, next) => {
 
@@ -90,8 +105,6 @@ app.get('/:subject/:id', (req, res, next) => {
                     if (senityCheck === 0) {
                         continue;
                     }
-
-
 
                     let max_point = 0;
                     let min_money = 0;
@@ -139,12 +152,118 @@ app.get('/:subject/:id', (req, res, next) => {
         });
     }
     else if (req.params['subject'] === 'competition' && req.params['id'] === '1'){
+        getCompetition( (err, rows) => {
+            if (err) {
+                return next(err);
+            }
+            let objs = [];
+            for (let i in rows) {
+                objs.push({
+                    id: rows[i].id,
+                    title: rows[i].title,
+                    statement: rows[i].statement
+                });
+            }
 
+            res.json(objs);
+        });
     }
     else {
         res.send('API no matches');
     }
 
+});
+
+
+let compiler = require('compilex');
+compiler.init();
+
+let envData = { OS : "linux"};
+
+app.post('/python', (req, res) => {
+    compiler.compilePython(envData , req.body.code , function(data){
+        res.send(data);
+        //console.log(req);
+        //console.log(data);
+    });
+});
+
+app.post('/cpp', (req, res) => {
+    let code = req.body.code;
+    const fs = require('fs');
+    fs.writeFile("temp/filename.cpp", code, () => {
+        const exec = require('child_process').exec;
+        const child = exec('g++ temp/filename.cpp -o temp/output.out',  (e, cout, sterr) => {
+            if (sterr){
+                console.log(sterr);
+                const data = {
+                    output: cout,
+                    error: sterr
+                };
+                res.send(data);
+            }
+            else{
+                const exec2 = require('child_process').exec;
+                const child2 = exec2('temp/output.out', (err, stdout, stderr) => {
+                    const data = {
+                        output: stdout,
+                        error: stderr
+                    };
+                    res.send(data);
+                });
+            }
+        });
+    });
+});
+
+app.post('/java', (req, res) => {
+    let code = req.body.code;
+    const fs = require('fs');
+    fs.writeFile("temp/main.java", code, () => {
+        const exec = require('child_process').exec;
+        const child = exec('javac temp/main.java',  (e, cout, sterr) => {
+            if (sterr){
+                console.log(sterr);
+                const data = {
+                    output: cout,
+                    error: sterr
+                };
+                res.send(data);
+            }
+            else{
+                const exec2 = require('child_process').exec;
+                const child2 = exec2('cd temp; java main', (err, stdout, stderr) => {
+                    const data = {
+                        output: stdout,
+                        error: stderr
+                    };
+                    res.send(data);
+                });
+            }
+        });
+    });
+});
+
+app.post('/go', (req, res) => {
+    let code = req.body.code;
+    const fs = require('fs');
+    fs.writeFile("temp/test.go", code, () => {
+        const exec = require('child_process').exec;
+        const child = exec('go run temp/test.go',  (e, sterr, cout) => {
+            let data;
+            if (e){
+                data = {
+                    error: cout
+                };
+            }
+            else{
+                data = {
+                    output: cout
+                };
+            }
+            res.send(data);
+        });
+    });
 });
 
 app.listen(process.env.PORT || 3000);

@@ -2,7 +2,6 @@
  * Created by ronnnwu on 6/4/17.
  */
 import React, { Component } from 'react';
-import axios from 'axios';
 
 class Tutorial extends Component{
 
@@ -12,7 +11,7 @@ class Tutorial extends Component{
             showProblem : 0,
             showHint: 0,
             showAns: 0,
-            problem : {},
+            problem :  props.problem,
             playerSel: [0,0,0],
             correctAns: -1
         };
@@ -25,14 +24,6 @@ class Tutorial extends Component{
         this.handleCChange = this.handleCChange.bind(this);
     }
 
-    componentDidMount(){
-        axios.get('http://sample-env-2.8t95hzwxpb.us-east-1.elasticbeanstalk.com/tutorial/1')
-            .then( (response) => {
-                this.setState ({
-                    problem: response.data[0]
-                });
-            })
-    }
 
     handleAChange(e){
         e.preventDefault();
@@ -117,7 +108,7 @@ class Tutorial extends Component{
                 <div>
                     <ul>
                         <li>
-                            <a onClick={this.clickMe}>Problem 1: Basketball Team Formation</a>
+                            <a onClick={this.clickMe}>Problem 1: {this.state.problem.title}</a>
                         </li>
                     </ul>
                 </div>
@@ -173,6 +164,7 @@ class Tutorial extends Component{
 
         return (
             <div>{block}</div>
+
         );
     }
 }
