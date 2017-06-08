@@ -1,1 +1,0 @@
-print 1\\nprint 1
